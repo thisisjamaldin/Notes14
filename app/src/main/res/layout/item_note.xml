@@ -32,4 +32,13 @@
         app:layout_constraintTop_toBottomOf="@id/item_title"
         tools:text="Desc" />
 
+    <ImageView
+        android:id="@+id/item_delete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="12dp"
+        android:src="@drawable/ic_delete"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

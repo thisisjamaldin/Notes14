@@ -28,18 +28,29 @@ public class AddFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Button button = view.findViewById(R.id.add);
 
-        button.setOnClickListener(v ->{
-            Note note = new Note(imageUri, "", "", "");
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("model", note);
 
-        });
+        if (getArguments() != null){
+            button.setText("Edit");
+            button.setOnClickListener(v -> {
+                Note note = new Note(imageUri, "", "", "");
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("edit", note);
+
+            });
+        } else {
+            button.setOnClickListener(v ->{
+                Note note = new Note(imageUri, "", "", "");
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("model", note);
+
+            });
+        }
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        imageUri = data.getData();
+        imageUri = data.getData().toString();
     }
 }

@@ -1,6 +1,9 @@
 package com.geeks.notes;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,11 @@ import java.util.Set;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     private List<Note> list = new ArrayList<>();
+    private IOnItem listener;
+
+    public NoteAdapter(IOnItem listener) {
+        this.listener = listener;
+    }
 
     public void setList(List<Note> list){
 //        this.list = list;
@@ -33,6 +41,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     public void addNote(Note note){
         list.add(note);
         notifyDataSetChanged();
+    }
+
+    public void delete(int pos){
+        list.remove(pos);
+        notifyItemRemoved(pos);
     }
 
     public Note getItem(int pos){
@@ -48,12 +61,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.title.setText(list.get(position).getTitle());
-        holder.desc.setText(list.get(position).getDesc());
-        Glide.with(holder.itemView)
-                .load(list.get(position).getImage())
-                .transform(new CenterCrop(),new RoundedCorners(25))
-                .into(holder.imageView);
+        holder.bind(position);
     }
 
     @Override
@@ -66,12 +74,35 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         private ImageView imageView;
         private TextView title;
         private TextView desc;
+        private ImageView delete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.item_image);
             title = itemView.findViewById(R.id.item_title);
             desc = itemView.findViewById(R.id.item_desc);
+            delete = itemView.findViewById(R.id.item_delete);
         }
+
+        void bind(int position){
+            title.setText(list.get(position).getTitle());
+            desc.setText(list.get(position).getDesc());
+            Glide.with(itemView)
+                    .load(list.get(position).getImage())
+                    .transform(new CenterCrop(),new RoundedCorners(25))
+                    .into(imageView);
+
+            delete.setOnClickListener(v -> {
+                listener.delete(getAdapterPosition());
+            });
+//            Note note = list.get(position);
+//            listener.edit(getAdapterPosition(), note);
+        }
+    }
+
+    interface IOnItem{
+        void delete(int pos);
+        void share(int pos);
+        void edit(int pos, Note note);
     }
 }

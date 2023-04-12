@@ -1,5 +1,6 @@
 package com.geeks.notes;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,12 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements NoteAdapter.IOnItem {
 
     RecyclerView recyclerView;
     NoteAdapter adapter;
@@ -33,18 +35,18 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (getArguments()!=null){
+            getArguments().getSerializable("note");
+        }
+
         add = view.findViewById(R.id.add);
         recyclerView = view.findViewById(R.id.recycler);
 
-        adapter = new NoteAdapter();
+        adapter = new NoteAdapter(this);
         recyclerView.setAdapter(adapter);
 
-        List<Note> list = new ArrayList<>();
-        list.add(new Note("", "title2", ":description2", ""));
-        list.add(new Note("", "title3", ":", ""));
-        list.add(new Note("", "title4", ":descrip", ""));
-        list.add(new Note("", "title5", ":description2 fg fdsg fdg ", ""));
-        adapter.setList(list);
+        Note note = (Note) getArguments().getSerializable("add");
+        adapter.addNote(note);
 
         add.setOnClickListener(v -> {
             requireActivity()
@@ -53,6 +55,28 @@ public class MainFragment extends Fragment {
                     .replace(R.id.main_container, new AddFragment())
                     .commit();
         });
+
+    }
+
+    @Override
+    public void delete(int pos) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+        alert.setTitle("Warning");
+        alert.setMessage("Are you sure to delete?");
+        alert.setPositiveButton("Delete", (dialogInterface, i) -> {
+            adapter.delete(pos);
+        });
+        alert.setNegativeButton("Cancel", null);
+        alert.show();
+    }
+
+    @Override
+    public void share(int pos) {
+        adapter.getItem(pos);
+    }
+
+    @Override
+    public void edit(int pos, Note note) {
 
     }
 }
